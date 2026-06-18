@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import {
   Search,
@@ -670,6 +671,17 @@ export default function StudentModule({ token }: StudentModuleProps) {
                     onChange={(e) => setFormData(p => ({ ...p, classVal: e.target.value }))}
                     className="w-full px-3.5 py-2 bg-gray-50 dark:bg-gray-955 text-gray-900 dark:text-white border border-gray-200 dark:border-gray-850 rounded-xl focus:ring-1 focus:ring-indigo-500/25 focus:border-indigo-500 focus:outline-none text-xs text-medium"
                   >
+                    <option value="Nursery">Nursery</option>
+                    <option value="LKG">LKG</option>
+                    <option value="UKG">UKG</option>
+                    <option value="Grade 1">Grade 1</option>
+                    <option value="Grade 2">Grade 2</option>
+                    <option value="Grade 3">Grade 3</option>
+                    <option value="Grade 4">Grade 4</option>
+                    <option value="Grade 5">Grade 5</option>
+                    <option value="Grade 6">Grade 6</option>
+                    <option value="Grade 7">Grade 7</option>
+                    <option value="Grade 8">Grade 8</option>
                     <option value="Grade 9">Grade 9</option>
                     <option value="Grade 10">Grade 10</option>
                     <option value="Grade 11">Grade 11</option>
@@ -827,3 +839,4 @@ function UserIconWrapper({ gender }: { gender: string }) {
   }
   return <User className="w-4.5 h-4.5 text-blue-500" />;
 }
+```
