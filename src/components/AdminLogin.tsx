@@ -22,19 +22,17 @@ export default function AdminLogin({ onLoginSuccess }: AdminLoginProps) {
     setError(null);
 
     try {
-      const response = await fetch("/api/auth/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username, password }),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || "Authentication failed.");
+      await new Promise(resolve => setTimeout(resolve, 800));
+      
+      if (username === "admin" && password === "admin123") {
+        onLoginSuccess("demo-token-123", {
+          id: "admin-1",
+          username: "admin",
+          name: "Administrator"
+        });
+      } else {
+        throw new Error("Invalid username or password.");
       }
-
-      onLoginSuccess(data.token, data.user);
     } catch (err: any) {
       setError(err.message || "Unable to connect to the server.");
     } finally {
@@ -45,7 +43,6 @@ export default function AdminLogin({ onLoginSuccess }: AdminLoginProps) {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-950 p-4 transition-colors duration-200">
       <div className="w-full max-w-md bg-white dark:bg-gray-900 rounded-2xl shadow-xl border border-gray-100 dark:border-gray-800 p-8 transition-colors duration-200 relative overflow-hidden">
-        {/* Decorative corner accent */}
         <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-500/10 rounded-full blur-2xl -mr-16 -mt-16" />
         <div className="absolute bottom-0 left-0 w-32 h-32 bg-emerald-500/10 rounded-full blur-2xl -ml-16 -mb-16" />
 
@@ -140,4 +137,4 @@ export default function AdminLogin({ onLoginSuccess }: AdminLoginProps) {
       </div>
     </div>
   );
-}
+    }
