@@ -8,6 +8,14 @@ const PORT = 3000;
 // Set up server-side parsers
 app.use(express.json({ limit: "15mb" })); // To handle base64 image uploads
 
+// Middleware to catch malformed JSON syntax errors in incoming payload and return JSON instead of HTML
+app.use((err: any, req: any, res: any, next: any) => {
+  if (err instanceof SyntaxError && "status" in err && err.status === 400 && "body" in err) {
+    return res.status(400).json({ error: "Malformed JSON payload: " + err.message });
+  }
+  next(err);
+});
+
 // Database storage directory and file path
 const DATA_DIR = path.join(process.cwd(), "data");
 const DB_FILE = path.join(DATA_DIR, "db.json");
@@ -187,18 +195,37 @@ const requireAuth = (req: express.Request, res: express.Response, next: express.
 };
 
 // --- AUTHENTICATION API ROUTES ---
-app.post("/api/auth/login", (req, res) => {
-  const { username, password } = req.body;
-  const db = loadDB();
-  const user = db.users.find((u: any) => u.username === username);
+const handledLogin = (req: any, res: any) => {
+  try {
+    if (!req.body) {
+      return res.status(400).json({ error: "Request body is empty or malformed. Always send proper JSON headers." });
+    }
+    const { username, password } = req.body;
+    if (!username || !password) {
+      return res.status(400).json({ error: "Missing required fields: username and password cannot be blank." });
+    }
 
-  if (user && user.passwordHash === password) {
-    const token = `token-${Math.random().toString(36).substr(2)}-${Date.now()}`;
-    activeSessions[token] = user.id;
-    return res.json({ token, user: { id: user.id, username: user.username, name: user.name } });
+    const db = loadDB();
+    if (!db || !Array.isArray(db.users)) {
+      return res.status(500).json({ error: "Internal database configuration is invalid." });
+    }
+
+    const user = db.users.find((u: any) => u.username === username);
+
+    if (user && user.passwordHash === password) {
+      const token = `token-${Math.random().toString(36).substr(2)}-${Date.now()}`;
+      activeSessions[token] = user.id;
+      return res.json({ token, user: { id: user.id, username: user.username, name: user.name } });
+    }
+    return res.status(401).json({ error: "Invalid username or password. Try admin/admin123" });
+  } catch (error: any) {
+    console.error("Authentication post error:", error);
+    return res.status(500).json({ error: error?.message || "An unexpected error occurred during login authentication." });
   }
-  return res.status(401).json({ error: "Invalid username or password. Try admin/admin123" });
-});
+};
+
+app.post("/api/auth/login", handledLogin);
+app.post("/api/login", handledLogin);
 
 app.post("/api/auth/logout", (req, res) => {
   const authHeader = req.headers.authorization;
