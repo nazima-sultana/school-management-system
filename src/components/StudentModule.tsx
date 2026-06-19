@@ -838,4 +838,3 @@ function UserIconWrapper({ gender }: { gender: string }) {
   }
   return <User className="w-4.5 h-4.5 text-blue-500" />;
 }
-```
